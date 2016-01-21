@@ -32,13 +32,6 @@ class ResqueCommandProxy extends CommandProxy
                 InputOption::VALUE_REQUIRED,
                 'How many worker processes should run?',
                 1
-            )
-            ->addOption(
-                'shutdown',
-                null,
-                InputOption::VALUE_NONE,
-                'Specify this option to shut down the workers',
-                null
             );
     }
 }

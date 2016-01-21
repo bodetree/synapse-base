@@ -34,6 +34,10 @@ class ResqueCommand implements CommandInterface, LoggerAwareInterface
      */
     protected $output;
 
+    public static function cleanup_children($signal) {
+        $GLOBALS['send_signal'] = $signal;
+    }
+
     public function setResque(ResqueService $resque)
     {
         $this->resque = $resque;
@@ -61,11 +65,6 @@ class ResqueCommand implements CommandInterface, LoggerAwareInterface
             }
         );
 
-        if ($input->getOption('shutdown')) {
-            $this->shutdownWorkers();
-            return;
-        }
-
         $queues = $input->getArgument('queue');
         if (! count($queues)) {
             throw new RuntimeException('Not enough arguments.');
@@ -74,43 +73,24 @@ class ResqueCommand implements CommandInterface, LoggerAwareInterface
         $count    = $input->getOption('count');
         $interval = $input->getOption('interval');
 
-        if ($output->getVerbosity() === OutputInterface::VERBOSITY_VERBOSE) {
-            $logLevel = Resque_Worker::LOG_NORMAL;
-        } elseif ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERY_VERBOSE) {
-            $logLevel = Resque_Worker::LOG_VERBOSE;
-        } else {
-            $logLevel = Resque_Worker::LOG_NONE;
-        }
-
-        $this->startWorkers($queues, $count, $logLevel, $interval);
+        $this->startWorkers($queues, $count, $interval);
     }
-
-    /**
-     * Shutdown all workers
-     */
-    protected function shutdownWorkers()
-    {
-        $workers = Resque_Worker::all();
-
-        foreach ($workers as $worker) {
-            list($name, $pid, $queues) = explode(':', (string) $worker);
-            posix_kill((int) $pid, SIGQUIT);
-        }
-
-        $this->output->writeln('<info>SIGQUIT sent to '.count($workers).' workers.</info>');
-    }
-
 
     /**
      * Start workers
      *
      * @param  string  $queues   comma separated list of queues
      * @param  integer $count    number of workers
-     * @param  integer $logLevel See Resque_Worker constants
      * @param  integer $interval How often (in seconds) to check for new jobs across the queues
      */
-    protected function startWorkers($queues, $count = 1, $logLevel = 0, $interval = 5)
+    protected function startWorkers($queues, $count = 1, $interval = 5)
     {
+        $children = array();
+        $GLOBALS['send_signal'] = FALSE;
+
+        $dieSignals = array(SIGTERM, SIGINT, SIGQUIT);
+        $allSignals = array_merge($dieSignals, array(SIGUSR1, SIGUSR2, SIGCONT, SIGPIPE));
+
         for ($i = 0; $i < $count; ++$i) {
             $pid = pcntl_fork();
 
@@ -121,7 +101,8 @@ class ResqueCommand implements CommandInterface, LoggerAwareInterface
             } elseif (! $pid) {
                 // Child now
                 $worker = new Resque_Worker($queues);
-                $worker->logLevel = $logLevel;
+                $worker->setLogger($this->logger);
+                $worker->hasParent = TRUE;
 
                 $this->output->writeln('<info>*** Starting worker '.$worker.'</info>');
                 $worker->work($interval);
@@ -129,6 +110,40 @@ class ResqueCommand implements CommandInterface, LoggerAwareInterface
                 // Have to break now to stop the child from forking! This will
                 // not run in the parent.
                 break;
+            } else {
+                $children[$pid] = 1;
+                while (count($children) == $count) {
+                    if (! isset($registered)) {
+                        declare(ticks = 1);
+                        foreach ($allSignals as $signal) {
+                            pcntl_signal($signal, array('Synapse\\Resque\\ResqueCommand', 'cleanup_children'));
+                        }
+
+                        $registered = TRUE;
+                    }
+
+                    $childPid = pcntl_waitpid(-1, $childStatus, WNOHANG);
+                    if ($childPid != 0) {
+                        $this->output->writeln('<error>A child worker died: '.$childPid.'</error>');
+                        unset($children[$childPid]);
+                        $i--;
+                    }
+
+                    usleep(250000);
+
+                    if ($GLOBALS['send_signal'] !== FALSE) {
+                        foreach ($children as $k => $v) {
+                            posix_kill($k, $GLOBALS['send_signal']);
+                            if (in_array($GLOBALS['send_signal'], $dieSignals)) {
+                                pcntl_waitpid($k, $childStatus);
+                            }
+                        }
+                        if (in_array($GLOBALS['send_signal'], $dieSignals)) {
+                            exit;
+                        }
+                        $GLOBALS['send_signal'] = FALSE;
+                    }
+                }
             }
         }
     }
