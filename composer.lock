@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "fb99b59cbe0e66a23b7a325fcfe230bc",
-    "content-hash": "b6c5a6c6986fb7ab36736aacbd153a89",
+    "hash": "422f242398f1135a926ef26cd7258c33",
+    "content-hash": "eb03da7ec7c468ee517692aa785e0d7b",
     "packages": [
         {
             "name": "bshaffer/oauth2-server-httpfoundation-bridge",
@@ -96,16 +96,16 @@
         },
         {
             "name": "chrisboulton/php-resque",
-            "version": "dev-master",
+            "version": "dev-no-fork",
             "source": {
                 "type": "git",
-                "url": "https://github.com/chrisboulton/php-resque.git",
-                "reference": "df69e8980cc21652f10cd775cb6a0e8c572ffd2d"
+                "url": "https://github.com/bodetree/php-resque.git",
+                "reference": "6afd8d4bda33395cabfc27d93e506e25ba5a2fa4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/chrisboulton/php-resque/zipball/df69e8980cc21652f10cd775cb6a0e8c572ffd2d",
-                "reference": "df69e8980cc21652f10cd775cb6a0e8c572ffd2d",
+                "url": "https://api.github.com/repos/bodetree/php-resque/zipball/6afd8d4bda33395cabfc27d93e506e25ba5a2fa4",
+                "reference": "6afd8d4bda33395cabfc27d93e506e25ba5a2fa4",
                 "shasum": ""
             },
             "require": {
@@ -130,7 +130,6 @@
                     "Resque": "lib"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -148,7 +147,10 @@
                 "redis",
                 "resque"
             ],
-            "time": "2015-05-13 11:58:23"
+            "support": {
+                "source": "https://github.com/bodetree/php-resque/tree/no-fork"
+            },
+            "time": "2016-01-21 18:54:47"
         },
         {
             "name": "colinmollenhour/credis",
@@ -2540,12 +2542,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "dc42502de400bb8b860b4960c5bc05fa30d8635e"
+                "reference": "28c2bb708134b8f257f9f05071a5f3e983e01d57"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/dc42502de400bb8b860b4960c5bc05fa30d8635e",
-                "reference": "dc42502de400bb8b860b4960c5bc05fa30d8635e",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/28c2bb708134b8f257f9f05071a5f3e983e01d57",
+                "reference": "28c2bb708134b8f257f9f05071a5f3e983e01d57",
                 "shasum": ""
             },
             "require": {
@@ -2609,7 +2611,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2016-01-20 04:16:04"
+            "time": "2016-01-21 04:49:41"
         },
         {
             "name": "symfony/yaml",

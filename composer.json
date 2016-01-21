@@ -10,7 +10,7 @@
         "zendframework/zend-db"                        : "~2.2.5",
         "bshaffer/oauth2-server-php"                   : "v1.0",
         "bshaffer/oauth2-server-httpfoundation-bridge" : "v1.0",
-        "chrisboulton/php-resque"                      : "dev-master",
+        "chrisboulton/php-resque"                      : "dev-no-fork",
         "mandrill/mandrill"                            : "1.0.52",
         "psr/log"                                      : "v1.0.0",
         "monolog/monolog"                              : "~1.7",
@@ -28,5 +28,11 @@
     },
     "autoload" : {
         "psr-0" : { "Synapse": "src/" }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/bodetree/php-resque"
+        }
+    ]
 }
