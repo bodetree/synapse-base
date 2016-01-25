@@ -24,12 +24,6 @@ use RollbarNotifier;
  */
 class LogServiceProvider implements ServiceProviderInterface
 {
-    /**
-     * Log configuration
-     *
-     * @var array
-     */
-    protected $config;
 
     /**
      * Register logging related services
@@ -38,17 +32,75 @@ class LogServiceProvider implements ServiceProviderInterface
      */
     public function register(Application $app)
     {
-        $this->config = $app['config']->load('log');
-        $config = $this->config;
-
-        $app['log.rollbar-handler'] = $app->share(function ($app) use ($config) {
-            $rollbarConfig = Arr::get($config, 'rollbar', []);
+        $app['log.rollbar-handler'] = $app->share(function ($app) {
+            $rollbarConfig = Arr::get($app['config']->load('log'), 'rollbar', []);
             return new RollbarHandler($rollbarConfig, $app['environment']);
         });
 
-        $handlers = $this->getHandlers($app);
-        $app['log'] = $app->share(function ($app) use ($handlers) {
-            return new Logger('main', $handlers);
+        $app['log.syslog-handler'] = $app->share(function ($app) {
+            return new SyslogHandler($ident, LOG_LOCAL0);
+        });
+
+        $app['log.file-handler'] = $app->share(function ($app) {
+            $file = Arr::path($app['config']->load('log'), 'file.path');
+            $format = '[%datetime%] %channel%.%level_name%: %message% %context% %extra%'.PHP_EOL;
+
+            $handler = new StreamHandler($file, Logger::INFO);
+            $handler->setFormatter(new LineFormatter($format));
+
+            return new DummyExceptionHandler($handler);
+        });
+
+        $app['log.file-exception-handler'] = $app->share(function ($app) {
+            $file = Arr::path($app['config']->load('log'), 'file.path');
+            $format = '%context.stacktrace%'.PHP_EOL;
+
+            $handler = new StreamHandler($file, Logger::ERROR);
+            $handler->setFormatter(new ExceptionLineFormatter($format));
+
+            return $handler;
+        });
+
+        $app['log.loggly-handler'] = $app->share(function ($app) {
+            $token = Arr::path($app['config']->load('log'), 'loggly.token');
+
+            if (! $token) {
+                throw new ConfigException('Loggly is enabled but the token is not set.');
+            }
+
+            return new LogglyHandler($token, Logger::INFO);
+        });
+
+        $app['log.handlers'] = $app->share(function ($app) {
+            $handlers = [];
+            $config = $app['config']->load('log');
+
+            $file = Arr::path($config, 'file.path');
+            if ($file) {
+                $handlers[] = $app['log.file-handler'];
+                $handlers[] = $app['log.file-exception-handler'];
+            }
+
+            $enableLoggly = Arr::path($config, 'loggly.enable');
+            if ($enableLoggly) {
+                $handlers[] = $app['log.loggly-handler'];
+            }
+
+            $enableRollbar = Arr::path($config, 'rollbar.enable');
+            if ($enableRollbar) {
+                $handlers[] = $app['log.rollbar-handler'];
+            }
+
+            $syslogIdent = Arr::path($config, 'syslog.ident');
+            if ($syslogIdent) {
+                $handlers[] = $app['log.syslog-handler'];
+            }
+
+            return $handlers;
+        });
+
+        $app['log'] = $app->share(function ($app) {
+            return new Logger('main', $app['log.handlers']);
         });
 
         $app->initializer('Synapse\\Log\\LoggerAwareInterface', function ($object, $app) {
@@ -69,118 +121,5 @@ class LogServiceProvider implements ServiceProviderInterface
 
         $monologErrorHandler->registerErrorHandler();
         $monologErrorHandler->registerFatalHandler();
-    }
-
-    /**
-     * Get an array of logging handlers to use
-     *
-     * @param  Application $app
-     * @return  array
-     */
-    protected function getHandlers(Application $app)
-    {
-        $handlers = [];
-
-        // File Handler
-        $file = Arr::path($this->config, 'file.path');
-
-        if ($file) {
-            $handlers[] = $this->getFileHandler($file);
-            $handlers[] = $this->getFileExceptionHandler($file);
-        }
-
-        // Loggly Handler
-        $enableLoggly = Arr::path($this->config, 'loggly.enable');
-
-        if ($enableLoggly) {
-            $handlers[] = $this->getLogglyHandler();
-        }
-
-        // Rollbar Handler
-        $enableRollbar = Arr::path($this->config, 'rollbar.enable');
-
-        if ($enableRollbar) {
-            $handlers[] = $this->getRollbarHandler($app['environment']);
-        }
-
-        // Syslog Handler
-        $syslogIdent = Arr::path($this->config, 'syslog.ident');
-
-        if ($syslogIdent) {
-            $handlers[] = $this->getSyslogHandler($syslogIdent);
-        }
-
-        return $handlers;
-    }
-
-    /**
-     * Create and return a syslog handler
-     *
-     * @param  string $ident
-     * @return SyslogHandler
-     */
-    protected function getSyslogHandler($ident)
-    {
-        $handler = new SyslogHandler($ident, LOG_LOCAL0);
-        return $handler;
-    }
-
-    /**
-     * Log handler for files
-     *
-     * @param  string      $file Path of log file
-     * @return FileHandler
-     */
-    protected function getFileHandler($file)
-    {
-        $format = '[%datetime%] %channel%.%level_name%: %message% %context% %extra%'.PHP_EOL;
-
-        $handler = new StreamHandler($file, Logger::INFO);
-        $handler->setFormatter(new LineFormatter($format));
-
-        return new DummyExceptionHandler($handler);
-    }
-
-    /**
-     * Exception log handler for files
-     *
-     * @param  string      $file Path of log file
-     * @return FileHandler
-     */
-    protected function getFileExceptionHandler($file)
-    {
-        $format = '%context.stacktrace%'.PHP_EOL;
-
-        $handler = new StreamHandler($file, Logger::ERROR);
-        $handler->setFormatter(new ExceptionLineFormatter($format));
-
-        return $handler;
-    }
-
-    /**
-     * Log handler for Loggly
-     *
-     * @return LogglyHandler
-     */
-    protected function getLogglyHandler()
-    {
-        $token = Arr::path($this->config, 'loggly.token');
-
-        if (! $token) {
-            throw new ConfigException('Loggly is enabled but the token is not set.');
-        }
-
-        return new LogglyHandler($token, Logger::INFO);
-    }
-
-    /**
-     * Register log handler for Rollbar
-     *
-     * @return RollbarHandler
-     */
-    protected function getRollbarHandler($environment)
-    {
-        $rollbarConfig = Arr::get($this->config, 'rollbar', []);
-        return new RollbarHandler($rollbarConfig, $environment);
     }
 }

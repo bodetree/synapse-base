@@ -31,6 +31,7 @@ class ResqueServiceProvider implements ServiceProviderInterface
             $command = new ResqueCommand();
             $command->setResque($app['resque']);
             $command->setDbAdapter($app['db']);
+            $command->setRollbarHandler($app['log.rollbar-handler']);
             return $command;
         });
     }

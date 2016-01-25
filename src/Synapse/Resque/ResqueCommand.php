@@ -8,6 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Synapse\Command\CommandInterface;
 use Synapse\Log\LoggerAwareInterface;
 use Synapse\Log\LoggerAwareTrait;
+use Synapse\Log\Handler\RollbarHandler;
 
 use Synapse\Resque\Resque as ResqueService;
 use Resque_Event;
@@ -32,6 +33,11 @@ class ResqueCommand implements CommandInterface, LoggerAwareInterface
     protected $dbAdapter;
 
     /**
+     * @var Synapse\Log\Handler\RollbarHandler
+     */
+    protected $rollbarLogger;
+
+    /**
      * @var InputInterface
      */
     protected $input;
@@ -54,6 +60,12 @@ class ResqueCommand implements CommandInterface, LoggerAwareInterface
     public function setDbAdapter(Adapter $adapter)
     {
         $this->dbAdapter = $adapter;
+        return $this;
+    }
+
+    public function setRollbarHandler(RollbarHandler $rollbar)
+    {
+        $this->rollbarLogger = $rollbar;
         return $this;
     }
 
@@ -84,6 +96,15 @@ class ResqueCommand implements CommandInterface, LoggerAwareInterface
             'beforePerform',
             function() use ($dbAdapter) {
                 $dbAdapter->getDriver()->getConnection()->disconnect();
+            }
+        );
+
+        $rollbar = $this->rollbarLogger;
+
+        Resque_Event::listen(
+            'afterPerform',
+            function() use ($rollbar) {
+                $rollbar->flush();
             }
         );
 

@@ -68,6 +68,11 @@ class RollbarHandler extends AbstractProcessingHandler
         }
     }
 
+    public function flush()
+    {
+        $this->rollbarNotifier->flush();
+    }
+
     /**
      * {@inheritdoc}
      */
