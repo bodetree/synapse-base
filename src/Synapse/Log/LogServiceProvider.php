@@ -39,6 +39,12 @@ class LogServiceProvider implements ServiceProviderInterface
     public function register(Application $app)
     {
         $this->config = $app['config']->load('log');
+        $config = $this->config;
+
+        $app['log.rollbar-handler'] = $app->share(function ($app) use ($config) {
+            $rollbarConfig = Arr::get($config, 'rollbar', []);
+            return new RollbarHandler($rollbarConfig, $app['environment']);
+        });
 
         $handlers = $this->getHandlers($app);
         $app['log'] = $app->share(function ($app) use ($handlers) {
