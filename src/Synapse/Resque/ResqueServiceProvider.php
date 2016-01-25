@@ -30,6 +30,7 @@ class ResqueServiceProvider implements ServiceProviderInterface
         $app['resque.command'] = $app->share(function ($app) {
             $command = new ResqueCommand();
             $command->setResque($app['resque']);
+            $command->setDbAdapter($app['db']);
             return $command;
         });
     }
