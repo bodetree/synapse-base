@@ -2,7 +2,7 @@
 
 namespace Synapse\Validator;
 
-use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Constraints as Assert;
 use Synapse\Entity\AbstractEntity;
@@ -24,7 +24,7 @@ abstract class AbstractArrayValidator
     /**
      * @param Validator $validator
      */
-    public function __construct(Validator $validator)
+    public function __construct(ValidatorInterface $validator)
     {
         $this->validator = $validator;
 
