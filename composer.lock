@@ -100,12 +100,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/bodetree/php-resque.git",
-                "reference": "6afd8d4bda33395cabfc27d93e506e25ba5a2fa4"
+                "reference": "4eb8c03875870961714b3ae4c9489b7dcaf3794f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bodetree/php-resque/zipball/6afd8d4bda33395cabfc27d93e506e25ba5a2fa4",
-                "reference": "6afd8d4bda33395cabfc27d93e506e25ba5a2fa4",
+                "url": "https://api.github.com/repos/bodetree/php-resque/zipball/4eb8c03875870961714b3ae4c9489b7dcaf3794f",
+                "reference": "4eb8c03875870961714b3ae4c9489b7dcaf3794f",
                 "shasum": ""
             },
             "require": {
@@ -150,7 +150,7 @@
             "support": {
                 "source": "https://github.com/bodetree/php-resque/tree/no-fork"
             },
-            "time": "2016-01-21 18:54:47"
+            "time": "2016-02-02 17:41:34"
         },
         {
             "name": "colinmollenhour/credis",
@@ -2046,16 +2046,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.8.21",
+            "version": "4.8.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "ea76b17bced0500a28098626b84eda12dbcf119c"
+                "reference": "dfb11aa5236376b4fc63853cf746af39fe780e72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/ea76b17bced0500a28098626b84eda12dbcf119c",
-                "reference": "ea76b17bced0500a28098626b84eda12dbcf119c",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/dfb11aa5236376b4fc63853cf746af39fe780e72",
+                "reference": "dfb11aa5236376b4fc63853cf746af39fe780e72",
                 "shasum": ""
             },
             "require": {
@@ -2114,7 +2114,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-12-12 07:45:58"
+            "time": "2016-02-02 09:01:21"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -2549,12 +2549,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "28c2bb708134b8f257f9f05071a5f3e983e01d57"
+                "reference": "8d669c50e4122c592a634580d9ea8b30c4edd0e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/28c2bb708134b8f257f9f05071a5f3e983e01d57",
-                "reference": "28c2bb708134b8f257f9f05071a5f3e983e01d57",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/8d669c50e4122c592a634580d9ea8b30c4edd0e1",
+                "reference": "8d669c50e4122c592a634580d9ea8b30c4edd0e1",
                 "shasum": ""
             },
             "require": {
@@ -2618,7 +2618,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2016-01-21 04:49:41"
+            "time": "2016-02-02 08:59:39"
         },
         {
             "name": "symfony/yaml",
