@@ -6,11 +6,11 @@ use Silex\Application;
 use Silex\ServiceProviderInterface;
 use Monolog\Logger;
 use Monolog\Handler\LogglyHandler;
+use Monolog\Handler\RollbarHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\ErrorHandler as MonologErrorHandler;
-use Synapse\Log\Handler\RollbarHandler;
 use Synapse\Log\Handler\DummyExceptionHandler;
 use Synapse\Log\Formatter\ExceptionLineFormatter;
 use Synapse\Config\Exception as ConfigException;
@@ -32,13 +32,24 @@ class LogServiceProvider implements ServiceProviderInterface
      */
     public function register(Application $app)
     {
-        $app['log.rollbar-handler'] = $app->share(function ($app) {
-            $rollbarConfig = Arr::get($app['config']->load('log'), 'rollbar', []);
-            return new RollbarHandler($rollbarConfig, $app['environment']);
+        $app['rollbar-notifier'] = $app->share(function ($app) {
+            $config = Arr::get($app['config']->load('log'), 'rollbar', []);
+            $token = Arr::get($config, 'post_server_item_access_token');
+
+            if (! $token) {
+                throw new ConfigException('Rollbar is enabled but the post server item access token is not set.');
+            }
+
+            return new RollbarNotifier([
+                'access_token' => $token,
+                'environment' => $app['environment'],
+                'batched' => false,
+                'root' => Arr::get($config, 'root'),
+            ]);
         });
 
-        $app['log.syslog-handler'] = $app->share(function ($app) {
-            return new SyslogHandler($ident, LOG_LOCAL0);
+        $app['log.rollbar-handler'] = $app->share(function ($app) {
+            return new RollbarHandler($app['rollbar-notifier'], Logger::ERROR);
         });
 
         $app['log.file-handler'] = $app->share(function ($app) {
