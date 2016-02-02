@@ -46,6 +46,7 @@ class LogServiceProvider implements ServiceProviderInterface
                 'batched' => false,
                 'root' => Arr::get($config, 'root'),
                 'host' => Arr::get($config, 'host'),
+                'code_version' => Arr::get($config, 'code_version'),
             ]);
         });
 
