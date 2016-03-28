@@ -158,10 +158,15 @@ class UserController extends AbstractRestController implements SecurityAwareInte
         $user = $user->getArrayCopy();
 
         unset($user['password']);
+        // I know this is terrible. Sorry.
         if (array_key_exists('saml_attributes', $user) && $user['saml_attributes']) {
-            $attribs = json_decode($user['saml_attributes']);
+            $attribs = json_decode($user['saml_attributes'], TRUE);
             if (is_array($attribs) && array_key_exists('i', $attribs)) {
-                $user['keepAliveUrl'] = $attribs['i'];
+                if (is_array($attribs['i'])) {
+                    $user['keepAliveUrl'] = $attribs['i'][0];
+                } else {
+                    $user['keepAliveUrl'] = $attribs['i'];
+                }
             }
         }
         unset($user['saml_attributes']);
