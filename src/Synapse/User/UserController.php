@@ -154,6 +154,7 @@ class UserController extends AbstractRestController implements SecurityAwareInte
                 $user['keepAliveUrl'] = $attribs['i'];
             }
         }
+        unset($user['saml_attributes']);
 
         return $user;
     }
