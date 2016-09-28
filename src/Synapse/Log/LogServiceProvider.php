@@ -47,6 +47,7 @@ class LogServiceProvider implements ServiceProviderInterface
                 'root' => Arr::get($config, 'root'),
                 'host' => Arr::get($config, 'host'),
                 'code_version' => Arr::get($config, 'code_version'),
+                'enable_utf8_sanitization' => Arr::get($config, 'enable_utf8_sanitization', true),
             ]);
         });
 
