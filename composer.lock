@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "95ad1df6be6e787ea17d4d299aefc0ff",
-    "content-hash": "73468c521fb5fa6b8072bfc404b77599",
+    "hash": "edc574609fdf5b06fb5df1f66d13b3c3",
+    "content-hash": "aa7ab3e7964e40568ab5a086784230fa",
     "packages": [
         {
             "name": "bshaffer/oauth2-server-httpfoundation-bridge",
@@ -284,6 +284,7 @@
                 "rest",
                 "web service"
             ],
+            "abandoned": "guzzlehttp/guzzle",
             "time": "2015-03-18 18:23:50"
         },
         {
@@ -696,16 +697,16 @@
         },
         {
             "name": "rollbar/rollbar",
-            "version": "v0.15.0",
+            "version": "v0.18.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rollbar/rollbar-php.git",
-                "reference": "f4ead5be5e52443f0c9e0272a0cd5813a5b3199a"
+                "reference": "fafe13f8beb669d6bba0137f3703fa808d50cbb7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rollbar/rollbar-php/zipball/f4ead5be5e52443f0c9e0272a0cd5813a5b3199a",
-                "reference": "f4ead5be5e52443f0c9e0272a0cd5813a5b3199a",
+                "url": "https://api.github.com/repos/rollbar/rollbar-php/zipball/fafe13f8beb669d6bba0137f3703fa808d50cbb7",
+                "reference": "fafe13f8beb669d6bba0137f3703fa808d50cbb7",
                 "shasum": ""
             },
             "require": {
@@ -718,6 +719,7 @@
             "type": "library",
             "autoload": {
                 "classmap": [
+                    "src/Level.php",
                     "src/rollbar.php"
                 ]
             },
@@ -741,7 +743,7 @@
                 "logging",
                 "monitoring"
             ],
-            "time": "2015-07-29 00:03:24"
+            "time": "2016-07-05 15:50:29"
         },
         {
             "name": "silex/silex",
